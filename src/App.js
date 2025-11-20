@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { HelpCircle, Sun, Moon, ArrowLeft } from 'lucide-react';
+import { HelpCircle, Sun, Moon, ArrowLeft, Heart } from 'lucide-react';
 import UnitConverter from './UnitConverter';
+import useFavorites from './useFavorites';
+import FavoritesScreen from './FavoritesScreen';
 
 const App = () => {
   const [activeTab, setActiveTab] = useState('main');
   const [darkMode, setDarkMode] = useState(false);
+  const { favorites, addToFavorites, removeFromFavorites } = useFavorites();
 
   useEffect(() => {
     if (darkMode) {
@@ -41,51 +44,86 @@ const App = () => {
         </div>
 
         {/* Main Navigation */}
-        {activeTab === 'main' ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <CalculatorCard
-              title="Калькулятор бетона"
-              description="Рассчитайте объем и вес бетона для вашей конструкции"
-              onClick={() => setActiveTab('concrete')}
-              icon="🏗️"
-              darkMode={darkMode}
-            />
-            <CalculatorCard
-              title="Калькулятор плитки"
-              description="Определите количество плитки для пола или стены"
-              onClick={() => setActiveTab('tiles')}
-              icon="🪵"
-              darkMode={darkMode}
-            />
-            <CalculatorCard
-              title="Конвертер единиц"
-              description="Мгновенно переводите метры в сантиметры, литры в м³ и многое другое"
-              onClick={() => setActiveTab('converter')}
-              icon="↔️"
-              darkMode={darkMode}
-            />
-          </div>
-        ) : activeTab === 'concrete' ? (
-  <ConcreteCalculator darkMode={darkMode} onBack={() => setActiveTab('main')} />
+{activeTab === 'main' ? (
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <CalculatorCard
+      title="Калькулятор бетона"
+      description="Рассчитайте объем и вес бетона для вашей конструкции"
+      onClick={() => setActiveTab('concrete')}
+      icon="🏗️"
+      darkMode={darkMode}
+    />
+    <CalculatorCard
+      title="Калькулятор плитки"
+      description="Определите количество плитки для пола или стены"
+      onClick={() => setActiveTab('tiles')}
+      icon="🪵"
+      darkMode={darkMode}
+    />
+    <CalculatorCard
+      title="Конвертер единиц"
+      description="Мгновенно переводите метры в сантиметры, литры в м³ и многое другое"
+      onClick={() => setActiveTab('converter')}
+      icon="↔️"
+      darkMode={darkMode}
+    />
+    {/* НОВАЯ КАРТОЧКА ДЛЯ ИЗБРАННОГО */}
+    <CalculatorCard
+      title="Избранное"
+      description={`Сохраненные расчеты (${favorites.length})`}
+      onClick={() => setActiveTab('favorites')}
+      icon="❤️"
+      darkMode={darkMode}
+      badge={favorites.length > 0 ? favorites.length : null}
+    />
+  </div>
+) : activeTab === 'concrete' ? (
+  <ConcreteCalculator 
+    darkMode={darkMode} 
+    onBack={() => setActiveTab('main')} 
+    addToFavorites={addToFavorites} 
+  />
 ) : activeTab === 'tiles' ? (
-  <TilesCalculator darkMode={darkMode} onBack={() => setActiveTab('main')} />
+  <TilesCalculator 
+    darkMode={darkMode} 
+    onBack={() => setActiveTab('main')} 
+    addToFavorites={addToFavorites} 
+  />
 ) : activeTab === 'converter' ? (
-  <UnitConverter darkMode={darkMode} onBack={() => setActiveTab('main')} />
+  <UnitConverter 
+    darkMode={darkMode} 
+    onBack={() => setActiveTab('main')} 
+    addToFavorites={addToFavorites} 
+  />
+) : activeTab === 'favorites' ? (
+  <FavoritesScreen 
+    darkMode={darkMode} 
+    onBack={() => setActiveTab('main')} 
+    favorites={favorites}
+    removeFromFavorite={removeFromFavorites}
+  />
 ) : null}
       </div>
     </div>
   );
 };
 
-const CalculatorCard = ({ title, description, onClick, icon, darkMode }) => (
+const CalculatorCard = ({ title, description, onClick, icon, darkMode, badge }) => (
   <button
     onClick={onClick}
     className={`p-6 rounded-2xl border-2 transition-all duration-300 transform hover:scale-105 ${
       darkMode 
         ? 'bg-gray-800 border-gray-700 hover:border-blue-500 text-white' 
         : 'bg-white border-gray-200 hover:border-blue-300 text-gray-900'
-    } shadow-lg hover:shadow-xl`}
+    } shadow-lg hover:shadow-xl relative`}
   >
+    {badge && (
+      <div className={`absolute top-2 right-2 w-5 h-5 flex items-center justify-center text-xs font-bold rounded-full ${
+        darkMode ? 'bg-red-500 text-white' : 'bg-red-500 text-white'
+      }`}>
+        {badge}
+      </div>
+    )}
     <div className="text-4xl mb-4 flex justify-center">{icon}</div>
     <h3 className="text-xl font-semibold mb-2 text-center">{title}</h3>
     <p className={`text-center ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
@@ -94,7 +132,7 @@ const CalculatorCard = ({ title, description, onClick, icon, darkMode }) => (
   </button>
 );
 
-const ConcreteCalculator = ({ darkMode, onBack }) => {
+const ConcreteCalculator = ({ darkMode, onBack, addToFavorites }) => {
   const [length, setLength] = useState('');
   const [width, setWidth] = useState('');
   const [height, setHeight] = useState('');
@@ -309,7 +347,7 @@ const ConcreteCalculator = ({ darkMode, onBack }) => {
   );
 };
 
-const TilesCalculator = ({ darkMode, onBack }) => {
+const TilesCalculator = ({ darkMode, onBack, addToFavorites }) => {
   const [surfaceType, setSurfaceType] = useState('floor');
   const [surfaceLength, setSurfaceLength] = useState('');
   const [surfaceWidth, setSurfaceWidth] = useState('');
@@ -555,6 +593,34 @@ const TilesCalculator = ({ darkMode, onBack }) => {
                 <span>{remainingArea.toFixed(2)} м²</span>
               </div>
             )}
+            {/* КНОПКА СОХРАНЕНИЯ (вставьте СРАЗУ ПОСЛЕ results и ПЕРЕД закрывающим </div>) */}
+      {(surfaceArea > 0 && packageAreaNum > 0) && (
+        <button
+          onClick={() => {
+            addToFavorites({
+              type: 'tiles',
+              surfaceType,
+              surfaceLength,
+              surfaceWidth,
+              surfaceLengthUnit,
+              surfaceWidthUnit,
+              packageArea,
+              packagesNeeded,
+              remainingArea: remainingArea,
+              wastePercentage: wastePercent
+            });
+            alert('✅ Расчет сохранен в избранное!');
+          }}
+          className={`mt-6 w-full py-3 rounded-xl font-bold text-lg flex items-center justify-center ${
+            darkMode 
+              ? 'bg-amber-600 hover:bg-amber-700' 
+              : 'bg-amber-500 hover:bg-amber-600 text-white'
+          } transition-all shadow-lg hover:shadow-xl`}
+        >
+          <Heart size={24} className="mr-2" />
+          Сохранить расчет
+        </button>
+      )}
           </div>
         </div>
       )}

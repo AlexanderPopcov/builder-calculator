@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { HelpCircle } from 'lucide-react';
+import { Heart } from 'lucide-react';
 
-const UnitConverter = ({ darkMode, onBack }) => {
+const UnitConverter = ({ darkMode, onBack, addToFavorites }) => {
   const [value, setValue] = useState('');
   const [fromUnit, setFromUnit] = useState('m');
   const [toUnit, setToUnit] = useState('cm');
@@ -353,6 +354,29 @@ const UnitConverter = ({ darkMode, onBack }) => {
           </div>
         </div>
       </div>
+      {result && (
+          <button
+            onClick={() => {
+              addToFavorites({
+                type: 'converter',
+                fromValue: value,
+                fromUnit,
+                toValue: result,
+                toUnit,
+                timestamp: new Date().toISOString()
+              });
+              alert('✅ Конвертация сохранена в избранное!');
+            }}
+            className={`mt-6 w-full py-3 rounded-xl font-bold text-lg flex items-center justify-center ${
+              darkMode 
+                ? 'bg-amber-600 hover:bg-amber-700' 
+                : 'bg-amber-500 hover:bg-amber-600 text-white'
+            } transition-all shadow-lg hover:shadow-xl`}
+          >
+            <Heart size={24} className="mr-2" />
+            Сохранить конвертацию
+          </button>
+        )}
 
       {showHelp && <HelpModal />}
     </div>

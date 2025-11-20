@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { HelpCircle, Sun, Moon, ArrowLeft } from 'lucide-react';
+import UnitConverter from './UnitConverter';
 
 const App = () => {
-  const [activeTab, setActiveTab] = useState('concrete');
+  const [activeTab, setActiveTab] = useState('main');
   const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
@@ -56,12 +57,21 @@ const App = () => {
               icon="🪵"
               darkMode={darkMode}
             />
+            <CalculatorCard
+              title="Конвертер единиц"
+              description="Мгновенно переводите метры в сантиметры, литры в м³ и многое другое"
+              onClick={() => setActiveTab('converter')}
+              icon="↔️"
+              darkMode={darkMode}
+            />
           </div>
         ) : activeTab === 'concrete' ? (
-          <ConcreteCalculator darkMode={darkMode} onBack={() => setActiveTab('main')} />
-        ) : (
-          <TilesCalculator darkMode={darkMode} onBack={() => setActiveTab('main')} />
-        )}
+  <ConcreteCalculator darkMode={darkMode} onBack={() => setActiveTab('main')} />
+) : activeTab === 'tiles' ? (
+  <TilesCalculator darkMode={darkMode} onBack={() => setActiveTab('main')} />
+) : activeTab === 'converter' ? (
+  <UnitConverter darkMode={darkMode} onBack={() => setActiveTab('main')} />
+) : null}
       </div>
     </div>
   );
@@ -76,9 +86,11 @@ const CalculatorCard = ({ title, description, onClick, icon, darkMode }) => (
         : 'bg-white border-gray-200 hover:border-blue-300 text-gray-900'
     } shadow-lg hover:shadow-xl`}
   >
-    <div className="text-4xl mb-4">{icon}</div>
-    <h3 className="text-xl font-semibold mb-2">{title}</h3>
-    <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{description}</p>
+    <div className="text-4xl mb-4 flex justify-center">{icon}</div>
+    <h3 className="text-xl font-semibold mb-2 text-center">{title}</h3>
+    <p className={`text-center ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+      {description}
+    </p>
   </button>
 );
 

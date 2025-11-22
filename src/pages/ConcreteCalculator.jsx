@@ -1,5 +1,6 @@
+// src/pages/ConcreteCalculator.jsx
 import React, { useState } from 'react';
-import { HelpCircle, Sun, Moon, ArrowLeft, Heart } from 'lucide-react';
+import { HelpCircle, Heart } from 'lucide-react'; // Убираем Sun, Moon, ArrowLeft, так как они не используются
 
 const ConcreteCalculator = ({ darkMode, onBack, addToFavorites }) => {
   const [length, setLength] = useState('');
@@ -194,20 +195,48 @@ const ConcreteCalculator = ({ darkMode, onBack, addToFavorites }) => {
 
         {/* Results */}
         {(volume > 0 || weight > 0) && (
-          <div className={`mt-6 p-4 rounded-2xl ${
-            darkMode ? 'bg-blue-900/30' : 'bg-blue-50'
-          }`}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <div className="text-sm font-medium mb-1">Объем</div>
-                <div className="text-2xl font-bold">{volume.toFixed(3)} м³</div>
+          <div> {/* Новый внешний div, который обертывает всё содержимое условия */}
+            <div className={`mt-6 p-4 rounded-2xl ${
+              darkMode ? 'bg-blue-900/30' : 'bg-blue-50'
+            }`}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <div className="text-sm font-medium mb-1">Объем</div>
+                  <div className="text-2xl font-bold">{volume.toFixed(3)} м³</div>
+                </div>
+                <div>
+                  <div className="text-sm font-medium mb-1">Вес бетона</div>
+                  <div className="text-2xl font-bold">{weight.toFixed(1)} кг</div>
+                </div>
               </div>
-              <div>
-                <div className="text-sm font-medium mb-1">Вес бетона</div>
-                <div className="text-2xl font-bold">{weight.toFixed(1)} кг</div>
-              </div>
+
+              {/* КНОПКА СОХРАНЕНИЯ - ОСТАЕТСЯ ЗДЕСЬ, ВНУТРИ ВНЕШНЕГО DIV */}
+              <button
+                onClick={() => {
+                  addToFavorites({
+                    type: 'concrete',
+                    length,
+                    width,
+                    height,
+                    lengthUnit,
+                    widthUnit,
+                    heightUnit,
+                    volume: volume.toFixed(3),
+                    weight: weight.toFixed(1)
+                  });
+                  alert('✅ Расчет бетона сохранен в избранное!');
+                }}
+                className={`mt-6 w-full py-3 rounded-xl font-bold text-lg flex items-center justify-center ${
+                  darkMode
+                    ? 'bg-amber-600 hover:bg-amber-700'
+                    : 'bg-amber-500 hover:bg-amber-600 text-white'
+                } transition-all shadow-lg hover:shadow-xl`}
+              >
+                <Heart size={24} className="mr-2" />
+                Сохранить расчет
+              </button>
             </div>
-          </div>
+          </div> // <-- Закрывающий div для нового внешнего контейнера
         )}
       </div>
 

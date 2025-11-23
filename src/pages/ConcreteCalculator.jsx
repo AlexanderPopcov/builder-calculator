@@ -1,6 +1,6 @@
 // src/pages/ConcreteCalculator.jsx
 import React, { useState } from 'react';
-import { HelpCircle, Heart } from 'lucide-react'; // Убираем Sun, Moon, ArrowLeft, так как они не используются
+import { HelpCircle, Heart } from 'lucide-react';
 
 const ConcreteCalculator = ({ darkMode, onBack, addToFavorites }) => {
   const [length, setLength] = useState('');
